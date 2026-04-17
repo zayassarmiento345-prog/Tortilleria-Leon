@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Tortillería León - Escáner</title>
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #0B3D2E; /* VERDE OSCURO */
+    color: white;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    color: #FFD700; /* AMARILLO */
+    font-size: 32px;
+    margin-bottom: 5px;
+}
+
+h2 {
+    font-weight: normal;
+    margin-top: 0;
+    color: white;
+}
+
+#reader {
+    width: 300px;
+    margin: 20px auto;
+    border: 4px solid #FFD700;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+#result {
+    font-size: 32px;
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+/* Estados */
+.aprobado {
+    background: #ffffff;
+    color: #0B3D2E;
+    border: 3px solid #FFD700;
+}
+
+.usado {
+    background: #FFD700;
+    color: #0B3D2E;
+    border: 3px solid #ffffff;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🌮 Tortillería León</h1>
+<h2>Escanea el código del cliente</h2>
+
+<div id="reader"></div>
+<div id="result">Esperando escaneo...</div>
+
+<script>
+const resultDiv = document.getElementById("result");
+
+// Base de datos local
+let database = JSON.parse(localStorage.getItem("db")) || {};
+
+function checkCustomer(id) {
+    let today = new Date().toDateString();
+
+    if (database[id] === today) {
+        resultDiv.innerHTML = "❌ YA SE USÓ HOY";
+        resultDiv.className = "usado";
+    } else {
+        resultDiv.innerHTML = "✅ APROBADO";
+        resultDiv.className = "aprobado";
+        database[id] = today;
+        localStorage.setItem("db", JSON.stringify(database));
+    }
+}
+
+function onScanSuccess(decodedText) {
+    checkCustomer(decodedText);
+}
+
+let scanner = new Html5QrcodeScanner("reader", {
+    fps: 10,
+    qrbox: 250
+});
+
+scanner.render(onScanSuccess);
+</script>
+
+</body>
+</html>
